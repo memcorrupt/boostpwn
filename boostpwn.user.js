@@ -1,35 +1,25 @@
 // ==UserScript==
 // @name         BoostPwn
 // @namespace    https://mem.rip/
-// @version      1.0
+// @version      2.0
 // @description  dont do the verification things on boost.ink
 // @author       memcorrupt
 // @match        https://boost.ink/*
 // @grant        none
-// @run-at document-start
+// @run-at document-end
 // ==/UserScript==
 
 (function(){
     'use strict';
-    const observer = new MutationObserver(mutations => {
-        for(const mutation of mutations){
-            for(const node of mutation.addedNodes){
-                if(node.src && node.src.match("unlock.js")){
-                    let url = node.getAttribute("version");
-                    if(!url){
-                        alert("boostpwn is broken");
-                        return;
-                    }
-                    observer.disconnect();
-                    setTimeout(() => { //chrome bug causes access violation ?
-                        location.href = atob(url);
-                    });
-                }
-            }
-        }
+
+    var windowEvents = $._data(window, "events");
+
+    windowEvents.blur[0].handler(); //set blurWorks to true
+    var focusHandler = windowEvents.focus[0].handler;
+
+    $(".step_block").each(function(){
+        this.onclick({isTrusted: true});
+        focusHandler();
     });
-    observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
-    });
+    $(".complete_btn")[0].onclick({isTrusted: true});
 })();
